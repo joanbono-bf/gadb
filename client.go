@@ -74,7 +74,6 @@ func (c Client) DeviceList() (devices []Device, err error) {
 	if resp, err = c.executeCommand("host:devices-l"); err != nil {
 		return
 	}
-
 	lines := strings.Split(resp, "\n")
 	devices = make([]Device, 0, len(lines))
 
@@ -93,9 +92,11 @@ func (c Client) DeviceList() (devices []Device, err error) {
 		sliceAttrs := fields[2:]
 		mapAttrs := map[string]string{}
 		for _, field := range sliceAttrs {
-			split := strings.Split(field, ":")
-			key, val := split[0], split[1]
-			mapAttrs[key] = val
+			if strings.Contains(field, ":") {
+				split := strings.Split(field, ":")
+				key, val := split[0], split[1]
+				mapAttrs[key] = val
+			}
 		}
 		devices = append(devices, Device{adbClient: c, serial: fields[0], attrs: mapAttrs})
 	}
